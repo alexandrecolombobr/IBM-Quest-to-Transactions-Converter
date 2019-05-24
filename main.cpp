@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     // Trying to open input file
     if ( inputFile.is_open() )
     {
-        std::vector<std::string> currentOutputLine; // Vector to serialize current transaction
+        std::string currentOutputLine; // Defining string to serialize current transaction
         std::string stringLineIndex; // String that represents the current output line index
 
         // Read input file
@@ -55,48 +55,36 @@ int main(int argc, char *argv[])
             std::istringstream lineSplit(line);
             std::vector<std::string> results((std::istream_iterator<std::string>(lineSplit)), std::istream_iterator<std::string>());
 
-            // Verify if current output line has changed
+            // Verify if current output line index has changed
             if ( results.front().compare(stringLineIndex) != 0) {
 
                 // If so, and we were iterating over a previous valid line, let's write it to the output file
                 if ( !currentOutputLine.empty() ) {
 
-                    // Using auxiliar string to avoid comparisons inside the loop
-                    std::string auxString;
-
-                    // Loop to prepare the output file current line
-                    for (auto i = currentOutputLine.begin(); i!=currentOutputLine.end(); ++i) {
-                        auxString.append(*i);
-                        auxString.push_back(' ');
-                    }
                     // At the end of the line we wish having a newline instead of an extra space
-                    auxString.pop_back();
-                    auxString.push_back('\n');
+                    currentOutputLine.pop_back();
+                    currentOutputLine.push_back('\n');
 
                     // Write the current line to output file
-                    outputFile << auxString;
+                    outputFile << currentOutputLine;
 
-                    // Clear current line vector
+                    // Clear current output file line string
                     currentOutputLine.clear();
                 }
 
-                // After saving content to file, update the current output line index
+                // After saving contents to file, update the current output line index
                 stringLineIndex = results.front();
             }
 
-            // Add content to vector
-            currentOutputLine.push_back(results.back());
+            // Add content to string representing the output file current line
+            currentOutputLine.append(results.back());
+            currentOutputLine.push_back(' ');
         }
 
         // Write the last line to output file
-        std::string auxString;
-        for (auto i = currentOutputLine.begin(); i!=currentOutputLine.end(); ++i) {
-            auxString.append(*i);
-            auxString.push_back(' ');
-        }
-        auxString.pop_back();
-        auxString.push_back('\n');
-        outputFile << auxString;
+        currentOutputLine.pop_back();
+        currentOutputLine.push_back('\n');
+        outputFile << currentOutputLine;
         currentOutputLine.clear();
 
         // Close files
